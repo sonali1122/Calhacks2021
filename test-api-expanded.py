@@ -123,14 +123,13 @@ query = {
 
 		} 
 	'''
-
 }
 
 auth = (token, secret)
 headers = {'content-type': 'application/json', 'accept': 'gzip'}
 
 r = requests.post(endpoint, json=query, auth=auth, headers=headers)
-"""
+
 print("DATA LEN:")
 print(len(r.json()['data']['model']['mattertags']))
 print("DATA:")
@@ -139,7 +138,6 @@ print("this should get door descrip")
 print(r.json()['data']['model']['mattertags'][0]['description'])
 string = "test"
 print(string + " added")
-"""
 
 
 
@@ -147,6 +145,30 @@ tagList = r.json()['data']['model']['mattertags']
 
 # adding information and classification to each tag
 for tag in tagList:
+	print(tag['label'])
+	mutation = {
+		"mutation": '''
+			mutation{
+				patchMattertag(
+					modelId: mid
+					mattertagId: tag['id']
+					patch: {
+						riskLevel = risk_assign(tag['label'], tag['position']['z'])
+						label: " [" + riskLevel + "]"
+					}
+				){
+					id
+				}
+			}
+
+		'''
+	}
+
+
+
+
+
+	'''
 	mutation{
 		patchMattertag(
 			modelId: mid
@@ -161,5 +183,6 @@ for tag in tagList:
 			id
 		}
 	}
+	'''
 
 

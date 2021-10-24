@@ -61,17 +61,17 @@ if the hazard is identified to have variable risk based on position, we assign a
 If the hazard does not depend on position, it gets assigned the definied risk level
 If the hazard is not in the list of hazards, it has NEGLIGIBLE RISK
 '''
-def risk_assign(tagLabel, position):
+def risk_assign(tagLabel, zposition):
 	if tagLabel in hazards.keys():
 
 		if tagLabel in varRiskHazards:
 			# run a var risk assignment algorithm 
 			risk = "HIGH RISK"
-			if position.z > 1.5:
+			if zposition > 1.5:
 				risk = "NEGLIGIBLE RISK"
-			elif position.z > 1.25:
+			elif zposition > 1.25:
 				risk = "LOW RISK"
-			elif position.z > 0.9:
+			elif zposition > 0.9:
 				risk = "MEDIUM RISK"
 
 			return risk
@@ -146,6 +146,7 @@ tagList = r.json()['data']['model']['mattertags']
 # adding information and classification to each tag
 for tag in tagList:
 	print(tag['label'])
+	riskLevel = risk_assign(tag['label'], tag['position']['z'])
 	mutation = {
 		"mutation": '''
 			mutation{
@@ -153,8 +154,7 @@ for tag in tagList:
 					modelId: mid
 					mattertagId: tag['id']
 					patch: {
-						riskLevel = risk_assign(tag['label'], tag['position']['z'])
-						label: " [" + riskLevel + "]"
+						label: riskLevel
 					}
 				){
 					id
@@ -163,6 +163,8 @@ for tag in tagList:
 
 		'''
 	}
+
+	m = requests.post(endpoint, json=mutation, auth=auth, headers=headers)
 
 
 

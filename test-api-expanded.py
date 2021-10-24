@@ -11,7 +11,7 @@ token = "9830cb8f6d90acc4"
 endpoint = 'https://api.matterport.com/api/models/graph'
 
 #ID of the model (our study lounge scan)
-mid: "kEWwJzPfNoT"
+mid = "kEWwJzPfNoT"
 
 #dictionary - key: hazards, value: possible risk level 
 hazards = {
@@ -147,26 +147,31 @@ tagList = r.json()['data']['model']['mattertags']
 for tag in tagList:
 	print(tag['label'])
 	riskLevel = risk_assign(tag['label'], tag['position']['z'])
+	tid = tag['id']
+
+
 	mutation = {
-		"mutation": '''
+		"query": '''
 			mutation{
 				patchMattertag(
-					modelId: mid
-					mattertagId: tag['id']
+					modelId: "kEWwJzPfNoT"
+					mattertagId: "hOTeXZrbEPD"
 					patch: {
-						label: riskLevel
+						label: "Door [HIGH RISK]"
+						color: "#00FF00"
+						description: "Could be hazard, could swing out and hit someone.\nChildren may open doors on their own or get hit if someone on the other side opens the door. Lock doors to unsafe places and make sure children are not near the door before open it."
 					}
 				){
 					id
 				}
 			}
-
 		'''
 	}
 
 	m = requests.post(endpoint, json=mutation, auth=auth, headers=headers)
-
-
+	print(m.status_code)
+	#print(m.json()['errors'])
+	#print(m.json()['code'])
 
 
 
